@@ -5,8 +5,6 @@ import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class DataHelper {
     static Faker faker = new Faker();
@@ -14,10 +12,10 @@ public class DataHelper {
     @Value
     public static class CardInfo {
         private String number;
-        private int month;
-        private int year;
+        private String month;
+        private String year;
         private String holder;
-        private int cvc;
+        private String cvc;
     }
 
     public static String getApprovedNumberCard() {
@@ -44,6 +42,22 @@ public class DataHelper {
 
     public static String getCVC() {
         return faker.number().digits(3);
+    }
+
+    public static String getRandomNumberCard() {
+        return faker.number().digits(16);
+    }
+
+    public static class Registrator {
+        public static CardInfo RegistrationApprovedCard() {
+            return new CardInfo(getApprovedNumberCard(), getMonth(), getYear(), getHolder(), getCVC());
+        }
+        public static CardInfo RegistrationDeclinedCard() {
+            return new CardInfo(getDeclinedNumberCard(), getMonth(), getYear(), getHolder(), getCVC());
+        }
+        public static CardInfo RegistrationRandomCard() {
+            return new CardInfo(getRandomNumberCard(), getMonth(), getYear(), getHolder(), getCVC());
+        }
     }
 
 
