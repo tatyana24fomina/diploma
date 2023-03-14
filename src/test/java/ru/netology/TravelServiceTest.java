@@ -201,5 +201,42 @@ public class TravelServiceTest {
                 .shouldHave(Condition.text("Неверный формат"))
                 .shouldBe(Condition.visible);
     }
+
+    @Test //11
+    void shouldBuyingATourWithDeclinedCard() {
+        MainPage mainPage = new MainPage();
+        var card = new DataHelper.Registrator().RegistrationDeclinedCard();
+
+        mainPage.clickToPaymentGate();
+        mainPage.setNumberCard(card.getNumber());
+        mainPage.setMonth(card.getMonth());
+        mainPage.setYear(card.getYear());
+        mainPage.setCardHolder(card.getHolder());
+        mainPage.setCVC(card.getCvc());
+
+        mainPage.clickToContinue();
+        $("#root > div > div.notification.notification_status_ok.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white > div.notification__title")
+                .shouldHave(Condition.text("Карта отклонена"))
+                .shouldBe(Condition.visible);
+    }
+
+    @Test //12
+    void shouldBuyingATourInCreditWithDeclinedCard() {
+        MainPage mainPage = new MainPage();
+        var card = new DataHelper.Registrator().RegistrationDeclinedCard();
+
+        mainPage.clickToCreditGate();
+        mainPage.setNumberCard(card.getNumber());
+        mainPage.setMonth(card.getMonth());
+        mainPage.setYear(card.getYear());
+        mainPage.setCardHolder(card.getHolder());
+        mainPage.setCVC(card.getCvc());
+
+        mainPage.clickToContinue();
+        $("#root > div > div.notification.notification_status_ok.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white > div.notification__title")
+                .shouldHave(Condition.text("Карта отклонена"))
+                .shouldBe(Condition.visible);
+    }
+
 }
 
