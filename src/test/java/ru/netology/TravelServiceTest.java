@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import page.objects.MainPage;
 
+import java.sql.*;
 import java.time.Duration;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -35,9 +36,9 @@ public class TravelServiceTest {
         mainPage.clickToContinue();
         $("#root > div > div.notification.notification_status_ok.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white > div.notification__title")
                 .shouldHave(Condition.text("Успешно"), Duration.ofSeconds(15))
-                .shouldBe(Condition.visible);
-        //Assertions.assertEquals("Успешно", mainPage.getStatus());
-    }
+            .shouldBe(Condition.visible);
+    //Assertions.assertEquals("Успешно", mainPage.getStatus());
+}
 
     @Test
         //2
@@ -58,7 +59,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //3
+    @Test
+        //3
     void shouldBuyingATourWithInvalidFutureYear() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -76,7 +78,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //4
+    @Test
+        //4
     void shouldBuyingATourWithInvalidPastYear() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -94,7 +97,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //5
+    @Test
+        //5
     void shouldBuyingATourWithInvalidCVC() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -112,7 +116,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //6
+    @Test
+        //6
     void shouldSuccessBuyingTourInCredit() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -130,7 +135,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //7
+    @Test
+        //7
     void shouldBuyingTourInCreditWithInvalidMonth() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -148,7 +154,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //8
+    @Test
+        //8
     void shouldBuyingATourInCreditWithInvalidFutureYear() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -166,7 +173,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //9
+    @Test
+        //9
     void shouldBuyingATourInCreditWithInvalidPastYear() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -184,7 +192,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //10
+    @Test
+        //10
     void shouldBuyingATourInCreditWithInvalidCVC() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
@@ -202,7 +211,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //11
+    @Test
+        //11
     void shouldBuyingATourWithDeclinedCard() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationDeclinedCard();
@@ -220,7 +230,8 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test //12
+    @Test
+        //12
     void shouldBuyingATourInCreditWithDeclinedCard() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationDeclinedCard();
@@ -238,5 +249,31 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
+    @Test
+    void shouldSuccessTransaction() {
+        MainPage mainPage = new MainPage();
+        var card = new DataHelper.Registrator().RegistrationApprovedCard();
+
+        mainPage.clickToPaymentGate();
+        mainPage.setNumberCard(card.getNumber());
+        mainPage.setMonth(card.getMonth());
+        mainPage.setYear(card.getYear());
+        mainPage.setCardHolder(card.getHolder());
+        mainPage.setCVC(card.getCvc());
+
+        mainPage.clickToContinue();
+
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "Ghfuf4290");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select status from payment_entity\n" +
+                    "order by created desc\n" +
+                    "limit 1");
+            Assertions.assertEquals(rs.getString("status"),"APPROVED");
+        } catch (SQLException e) {
+
+        }
+    }
 }
 
