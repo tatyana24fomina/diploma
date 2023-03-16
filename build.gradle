@@ -1,7 +1,13 @@
 plugins {
     id 'java'
     id 'io.freefair.lombok' version '6.6.2'
+    id 'io.qameta.allure' version '2.11.0'
 }
+
+    repositories {
+        // Repository is needed for downloading allure-commandline for building the report
+        mavenCentral()
+    }
 
 group 'ru.netology'
 version '1.0-SNAPSHOT'
@@ -20,6 +26,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'com.codeborne:selenide:6.12.0'
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
+    testImplementation 'io.qameta.allure:allure-testng:2.19.0'
 }
 
 test {

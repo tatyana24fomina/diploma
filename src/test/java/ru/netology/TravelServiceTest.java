@@ -230,8 +230,7 @@ public class TravelServiceTest {
                 .shouldBe(Condition.visible);
     }
 
-    @Test
-        //12
+    @Test //12
     void shouldBuyingATourInCreditWithDeclinedCard() {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationDeclinedCard();
@@ -273,6 +272,32 @@ public class TravelServiceTest {
             Assertions.assertEquals(rs.getString("status"),"APPROVED");
         } catch (SQLException e) {
 
+        }
+    }
+
+    @Test
+    void shouldTransactionWithDeclinedCard() {
+        MainPage mainPage = new MainPage();
+        var card = new DataHelper.Registrator().RegistrationDeclinedCard();
+
+        mainPage.clickToPaymentGate();
+        mainPage.setNumberCard(card.getNumber());
+        mainPage.setMonth(card.getMonth());
+        mainPage.setYear(card.getYear());
+        mainPage.setCardHolder(card.getHolder());
+        mainPage.setCVC(card.getCvc());
+
+        mainPage.clickToContinue();
+
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "Ghfuf4290");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select status from payment_entity\n" +
+                    "order by created desc\n" +
+                    "limit 1");
+            Assertions.assertEquals(rs.getString("status"),"DECLINED");
+        } catch (SQLException e) {
         }
     }
 }
