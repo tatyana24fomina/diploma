@@ -28,6 +28,7 @@ dependencies {
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
     testImplementation 'io.qameta.allure:allure-testng:2.19.0'
     testImplementation 'org.postgresql:postgresql:42.6.0'
+    testImplementation 'mysql:mysql-connector-java:8.0.32'
 }
 
 test {
