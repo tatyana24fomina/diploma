@@ -3,13 +3,20 @@ package ru.netology;
 import com.codeborne.selenide.Condition;
 import data.DataHelper;
 
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import page.objects.MainPage;
 
+import javax.imageio.stream.FileImageInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
 import java.time.Duration;
+import java.util.Properties;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
@@ -253,6 +260,19 @@ public class TravelServiceTest {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
 
+        Properties property = new Properties();
+
+        try {
+            FileInputStream fis = new FileInputStream("artifacts/application.properties");
+            property.load(fis);
+        }
+        catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         mainPage.clickToPaymentGate();
         mainPage.setNumberCard(card.getNumber());
         mainPage.setMonth(card.getMonth());
@@ -264,7 +284,7 @@ public class TravelServiceTest {
 
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "Ghfuf4290");
+            conn = DriverManager.getConnection(property.getProperty("spring.datasource.url"), property.getProperty("spring.datasource.username"), property.getProperty("spring.datasource.password"));
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("select status from payment_entity\n" +
                     "order by created desc\n" +
@@ -280,6 +300,19 @@ public class TravelServiceTest {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationDeclinedCard();
 
+        Properties property = new Properties();
+
+        try {
+            FileInputStream fis = new FileInputStream("artifacts/application.properties");
+            property.load(fis);
+        }
+        catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         mainPage.clickToPaymentGate();
         mainPage.setNumberCard(card.getNumber());
         mainPage.setMonth(card.getMonth());
@@ -291,13 +324,16 @@ public class TravelServiceTest {
 
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "Ghfuf4290");
+            conn = DriverManager.getConnection(property.getProperty("spring.datasource.url"), property.getProperty("spring.datasource.username"), property.getProperty("spring.datasource.password"));
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("select status from payment_entity\n" +
                     "order by created desc\n" +
                     "limit 1");
+            while (rs.next()) {
             Assertions.assertEquals(rs.getString("status"),"DECLINED");
+            }
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
