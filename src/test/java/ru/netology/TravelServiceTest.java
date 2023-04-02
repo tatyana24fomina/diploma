@@ -1,6 +1,7 @@
 package ru.netology;
 
 import com.codeborne.selenide.Condition;
+import data.DBObject;
 import data.DataHelper;
 
 import lombok.SneakyThrows;
@@ -260,19 +261,6 @@ public class TravelServiceTest {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationApprovedCard();
 
-        Properties property = new Properties();
-
-        try {
-            FileInputStream fis = new FileInputStream("artifacts/application.properties");
-            property.load(fis);
-        }
-        catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
         mainPage.clickToPaymentGate();
         mainPage.setNumberCard(card.getNumber());
         mainPage.setMonth(card.getMonth());
@@ -281,17 +269,18 @@ public class TravelServiceTest {
         mainPage.setCVC(card.getCvc());
 
         mainPage.clickToContinue();
+        $("#root > div > div.notification.notification_status_ok.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white > div.notification__title")
+                .shouldHave(Condition.text("Успешно"), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
 
-        Connection conn = null;
+        var db = new DBObject();
         try {
-            conn = DriverManager.getConnection(property.getProperty("spring.datasource.url"), property.getProperty("spring.datasource.username"), property.getProperty("spring.datasource.password"));
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select status from payment_entity\n" +
+            Assertions.assertEquals("APPROVED", db.executeQuery("select status from payment_entity\n" +
                     "order by created desc\n" +
-                    "limit 1");
-            Assertions.assertEquals(rs.getString("status"),"APPROVED");
-        } catch (SQLException e) {
-
+                    "limit 1"));
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -300,19 +289,6 @@ public class TravelServiceTest {
         MainPage mainPage = new MainPage();
         var card = new DataHelper.Registrator().RegistrationDeclinedCard();
 
-        Properties property = new Properties();
-
-        try {
-            FileInputStream fis = new FileInputStream("artifacts/application.properties");
-            property.load(fis);
-        }
-        catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
         mainPage.clickToPaymentGate();
         mainPage.setNumberCard(card.getNumber());
         mainPage.setMonth(card.getMonth());
@@ -321,20 +297,19 @@ public class TravelServiceTest {
         mainPage.setCVC(card.getCvc());
 
         mainPage.clickToContinue();
+        $("#root > div > div.notification.notification_status_ok.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white > div.notification__title")
+                .shouldHave(Condition.text("Успешно"), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
 
-        Connection conn = null;
+        var db = new DBObject();
         try {
-            conn = DriverManager.getConnection(property.getProperty("spring.datasource.url"), property.getProperty("spring.datasource.username"), property.getProperty("spring.datasource.password"));
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select status from payment_entity\n" +
+            Assertions.assertEquals("DECLINED", db.executeQuery("select status from payment_entity\n" +
                     "order by created desc\n" +
-                    "limit 1");
-            while (rs.next()) {
-            Assertions.assertEquals(rs.getString("status"),"DECLINED");
-            }
-        } catch (SQLException e) {
+                    "limit 1"));
+        }
+        catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
-}
+    }
 
